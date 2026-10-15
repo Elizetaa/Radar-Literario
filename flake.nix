@@ -8,8 +8,12 @@
       in
       pkgs.mkShell {
         packages = with pkgs; [
-          python313
-          dbeaver-bin
+          (python313.withPackages (ps: with ps; [
+            pydantic
+            sqlalchemy
+            fastapi
+        ]))
+        dbeaver-bin
         ];
       };
   };
