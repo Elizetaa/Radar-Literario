@@ -1,0 +1,1 @@
+Contém a parte de interface à ser instanciado

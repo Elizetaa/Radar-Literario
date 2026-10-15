@@ -14,6 +14,7 @@
             fastapi
         ]))
         dbeaver-bin
+        nodejs_26
         ];
       };
   };
