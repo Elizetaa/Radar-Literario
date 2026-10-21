@@ -4,12 +4,29 @@ Frontend em React 19, Vite e Tailwind CSS 4 para descobrir livros, acompanhar le
 
 ## Executar
 
-Requer Node.js e npm instalados.
+Instale o **Node.js 24 com npm** pelo [site oficial](https://nodejs.org/pt/download), selecionando Windows ou Linux conforme seu sistema. Depois, abra um novo terminal na raiz do repositório `Radar-Literario`.
 
-```sh
+### Windows
+
+No **Prompt de Comando (cmd)**:
+
+```bat
+cd Frontend\radar_literario
 npm install
 npm run dev
 ```
+
+### Ubuntu
+
+No **Terminal**:
+
+```sh
+cd Frontend/radar_literario
+npm install
+npm run dev
+```
+
+Abra no navegador o endereço exibido pelo Vite, normalmente **http://localhost:5173/**. Mantenha o terminal aberto enquanto usa o site e pressione **Ctrl+C** para encerrar. O protótipo funciona sem iniciar back-end ou banco de dados.
 
 Comandos disponíveis: `npm run build` cria a versão de produção; `npm run lint` executa o ESLint; `npm run preview` serve localmente a versão compilada.
 
