@@ -1,1 +1,0 @@
-Define Requests e Responses

@@ -1,1 +1,0 @@
-Implementações das interfaces
