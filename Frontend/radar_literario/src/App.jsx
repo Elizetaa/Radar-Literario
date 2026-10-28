@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { currentUser } from './data/mockData.js'
 import { libraryService } from './services/libraryService.js'
 import BookDiscovery from './features/book-discovery/BookDiscovery.jsx'
+import BackendTest from './features/backend-test/BackendTest.jsx'
+import './features/backend-test/launch-button.css'
 import './App.css'
 
 const navItems = [
@@ -82,7 +84,9 @@ function App() {
   async function saveInterest(book) { await libraryService.saveInterest(book.id); await refresh() }
   function openInterestedShelf() { setShelfFilter('Tenho interesse'); setPage('shelf') }
 
+  if (page === 'api-test') return <BackendTest onBack={() => setPage('home')} />
   return <div className="app-shell min-h-screen bg-[#faf9fb] text-[#29242c]">
+    <button className="backend-test-launch" onClick={() => setPage('api-test')}>Testar backend ↗</button>
     <header className="topbar"><button className="brand" onClick={() => setPage('home')}><span className="brand-mark">r.</span><span>radar<span className="brand-light">literário</span></span></button><label className="header-search min-w-0"><span aria-hidden="true">⌕</span><input value={query} onChange={(event) => { setQuery(event.target.value); if (event.target.value) setPage('search') }} placeholder="Pesquisar livros, autores, usuários..." aria-label="Pesquisar livros, autores ou usuários" /><button aria-label="Pesquisar" onClick={() => setPage('search')}>⌕</button></label><div className="header-user"><button onClick={() => setPage('profile')} className="user-short"><Avatar size="small" /><span>{profile.name.split(' ')[0]}</span></button><button className="primary-button compact" onClick={() => openForm('book')}>＋ <span>Novo livro</span></button></div></header>
     <div className="layout"><aside className="sidebar"><div className="sidebar-caption">MENU</div>{navItems.map(([id, label, icon]) => <button key={id} className={`nav-item ${page === id ? 'active' : ''}`} onClick={() => setPage(id)}><span className="nav-icon">{icon}</span>{label}</button>)}<div className="sidebar-rule"/><div className="sidebar-caption">SUAS LEITURAS</div><button className="nav-item" onClick={() => { setPage('shelf'); setShelfFilter('Fantasia') }}><span className="genre-dot violet"/> Fantasia</button><button className="nav-item" onClick={() => { setPage('shelf'); setShelfFilter('Romance') }}><span className="genre-dot pink"/> Romance</button><button className="nav-item" onClick={() => openForm('diary')}>＋ Registrar leitura</button><div className="sidebar-bottom"><div className="tip-icon">✦</div><strong>Leia, acompanhe,<br/>compartilhe.</strong><p>Um lugar para cada história.</p></div></aside>
     <main className="main-content min-w-0">{!(page === 'suggestions' && suggestionsView === 'discover') && <div className="mobile-greeting"><strong>Olá, {profile.name.split(' ')[0]} 👋</strong><span>Que história vamos descobrir hoje?</span></div>}

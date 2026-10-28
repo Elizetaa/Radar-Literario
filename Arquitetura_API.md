@@ -4,21 +4,21 @@ Documento de gestão e orientação do desenvolvimento do Radar Literário: uma 
 
 **Arquitetura definida:** TypeScript, React e Tailwind CSS no front-end; Go, Gin e GORM no back-end; MariaDB como banco relacional, SQL para consultas e migrações e DBeaver para administração. O desenvolvimento seguirá o padrão **MVC**, respeitando a organização existente do repositório.
 
-> Este README descreve a implementação futura. A nova arquitetura ainda não foi implementada. O front-end atual é um protótipo de atividade acadêmica e será completamente reescrito; suas telas e dados simulados servem como referência, sem compromisso de reaproveitar seu código.
+> O backend Go/MariaDB está implementado em `Backend/cmd` e `Backend/internal`, com execução e evidências em [Backend/README.md](Backend/README.md) e [Docs/cobertura_backend.md](Docs/cobertura_backend.md). O frontend atual continua sendo um protótipo separado; sua reescrita e integração permanecem trabalho futuro.
 
 ## 1. Referências e situação atual
 
 As fontes de requisitos são a [especificação do projeto](Docs/RadarLiterárioV2.pdf) e as [referências de interface](Docs/imagens.pdf). O [README do protótipo](Frontend/radar_literario/README.md) registra o comportamento da atividade existente. Em caso de divergência, registrar a decisão antes de implementar a funcionalidade.
 
-A divisão do Model preserva as notas existentes sobre [interfaces](Backend/src/model/interfaces/conceitos.md), suas [implementações](Backend/src/model/tools/conceitos.md) e [requests/responses](Backend/src/model/schemas/conceitos.md).
+A divisão do Model preserva as responsabilidades de [interfaces](Backend/internal/model/interfaces/), [implementações](Backend/internal/model/tools/) e [requests/responses](Backend/internal/model/schemas/).
 
 | Área | O que existe | Como será desenvolvido |
 | --- | --- | --- |
 | Front-end | React com Vite, JavaScript/JSX, Tailwind e CSS próprio; serviço com dados em memória. | Nova aplicação em TypeScript/TSX, mantendo React, Tailwind e Vite. |
-| Back-end | Esboço Python: dependências FastAPI/Pydantic/SQLAlchemy e modelo `Leitor`; `main.py` apenas imprime uma mensagem. | Substituição por uma API Go com Gin e GORM. |
-| Organização MVC | Pastas de Model e notas sobre interfaces, implementações e schemas. | Preservar essas responsabilidades e acrescentar controllers, rotas e infraestrutura. |
-| Persistência | Não há configuração de MariaDB, migrações ou API integrada ao front-end. | MariaDB com modelo relacional, restrições e migrações SQL versionadas. |
-| Ambiente | `flake.nix` disponibiliza Python, Node.js e DBeaver. | Atualizar o ambiente para incluir Go e MariaDB durante a migração. |
+| Back-end | API Go/Gin/GORM com contas, catálogo, leitura, comunidade, administração e complementos. | Manter contratos, regras e verificações junto às mudanças. |
+| Organização MVC | `cmd` compõe controllers, serviços e repositórios em `internal`; View no frontend. | Integrar a View pelos contratos documentados. |
+| Persistência | MariaDB, migrações SQL Goose, constraints e testes com banco isolado. | Operar backup, retenção e ambientes de implantação. |
+| Ambiente | Go, MariaDB, Node.js e DBeaver; Windows não depende de Nix. | Validar Nix/Compose no ambiente que os utilizar. |
 
 O protótipo não oferece autenticação, autorização ou persistência reais. As ações demonstradas nele não equivalem a requisitos já implementados.
 
@@ -38,7 +38,7 @@ O protótipo não oferece autenticação, autorização ou persistência reais. 
 
 O back-end utilizará `gorm.io/driver/mysql` para a conexão com MariaDB. A configuração segue a [documentação do GORM](https://gorm.io/docs/connecting_to_the_database.html), e a compatibilidade com MariaDB está documentada no [driver SQL utilizado](https://github.com/go-sql-driver/mysql#requirements).
 
-As versões serão escolhidas e registradas na etapa de preparação, conforme a compatibilidade entre ferramentas. `go.mod`/`go.sum` e o `package-lock.json` do front-end deverão ser versionados. Não se presume que as versões do protótipo serão as versões da aplicação definitiva.
+As versões Go e dependências estão registradas em `Backend/go.mod`/`go.sum`; o ambiente validado usa Go 1.27.3 e MariaDB 13.0.2. As versões do protótipo não determinam as da futura View.
 
 ## 3. Aplicação do padrão MVC
 
@@ -57,23 +57,23 @@ flowchart LR
 
 As respostas percorrem o caminho de volta em JSON. Somente a API acessará o banco durante o uso da aplicação.
 
-| Camada | Responsabilidade | Local planejado |
+| Camada | Responsabilidade | Local |
 | --- | --- | --- |
 | View | Renderizar telas, capturar ações e apresentar carregamento, sucesso e erros. | `Frontend/radar_literario/src/` |
-| Controller | Ler parâmetros e JSON, validar o formato, chamar serviços e traduzir resultados para HTTP. | `Backend/src/controller/` |
-| Model: entidades | Representar leitores, obras, edições e demais entidades e seus mapeamentos. | `Backend/src/model/core/` |
-| Model: serviços | Aplicar regras de negócio, verificar permissões sobre recursos e coordenar operações. | `Backend/src/model/services/` |
-| Model: interfaces | Declarar os contratos de repositórios necessários aos serviços. | `Backend/src/model/interfaces/` |
-| Model: implementações | Implementar os contratos de persistência com GORM e SQL. | `Backend/src/model/tools/` |
-| Schemas | Definir os objetos de transferência de dados (DTOs) de requisição e resposta, preservando a função descrita nas notas atuais. | `Backend/src/model/schemas/` |
+| Controller | Ler parâmetros e JSON, validar o formato, chamar serviços e traduzir resultados para HTTP. | `Backend/internal/controller/` |
+| Model: entidades | Representar leitores, obras, edições e demais entidades e seus mapeamentos. | `Backend/internal/model/core/` |
+| Model: serviços | Aplicar regras de negócio, verificar permissões sobre recursos e coordenar operações. | `Backend/internal/model/services/` |
+| Model: interfaces | Declarar os contratos de repositórios necessários aos serviços. | `Backend/internal/model/interfaces/` |
+| Model: implementações | Implementar os contratos de persistência com GORM e SQL. | `Backend/internal/model/tools/` |
+| Schemas | Definir os objetos de transferência de dados (DTOs) de requisição e resposta, preservando a função descrita nas notas atuais. | `Backend/internal/model/schemas/` |
 
 Os serviços receberão interfaces de repositório por injeção de dependências. O `main.go` montará a conexão, os repositórios, os serviços e os controllers. Os serviços não dependerão de `gin.Context`; o contexto da requisição será propagado como `context.Context` até as consultas.
 
 Controllers não executarão consultas diretamente. Componentes React não conterão regras de autorização ou acesso ao banco. Validações de interface melhorarão a experiência, mas a API aplicará as validações definitivas.
 
-## 4. Estrutura planejada
+## 4. Estrutura do backend e direção do frontend
 
-A árvore abaixo é o destino da migração: inclui arquivos e diretórios que ainda serão criados. Serão mantidos os nomes `Backend`, `Frontend`, `Docs` e o caminho `Frontend/radar_literario`.
+A estrutura executável do backend preserva `cmd` e `internal`. A árvore TypeScript do frontend abaixo continua sendo um destino futuro; não descreve uma integração entregue nesta implementação.
 
 ```text
 Radar-Literario/
@@ -81,19 +81,25 @@ Radar-Literario/
 ├── Docs/
 │   ├── RadarLiterárioV2.pdf
 │   ├── imagens.pdf
-│   ├── api.yaml                      # Contrato OpenAPI a criar
+│   ├── api.yaml                      # Contrato OpenAPI completo
 │   └── decisoes.md                   # Decisões e dúvidas resolvidas
 ├── Backend/
 │   ├── README.md                     # Instruções específicas da API
-│   ├── main.go                       # Inicialização e composição
+│   ├── cmd/api/main.go               # Inicialização e composição
+│   ├── cmd/admin/main.go             # Bootstrap administrativo
+│   ├── cmd/migrate/main.go           # Executor Goose
+│   ├── cmd/setup/main.go             # Preparação local nova
+│   ├── cmd/seed/main.go              # Dados fictícios opcionais
+│   ├── cmd/maintenance/main.go       # Retenção
+│   ├── cmd/openapi/main.go           # Contrato verificável
 │   ├── go.mod
 │   ├── go.sum
 │   ├── .env.example
 │   ├── migrations/                   # Migrações SQL numeradas
-│   └── src/
+│   └── internal/
 │       ├── config/                   # Configuração por ambiente
 │       ├── database/                 # Conexão e pool do banco
-│       ├── routes/                   # Registro de endpoints
+│       ├── router/                   # Registro de endpoints
 │       ├── middleware/               # Autenticação, CORS e logs
 │       ├── controller/               # Handlers HTTP por recurso
 │       └── model/
@@ -127,7 +133,7 @@ Radar-Literario/
 
 Testes Go ficarão próximos aos arquivos testados, com sufixo `_test.go`. Testes de interface poderão ficar próximos aos componentes e hooks. As pastas atuais `core`, `interfaces`, `tools` e `schemas` manterão suas funções, com implementação em Go no lugar de Python.
 
-Quando o módulo Go substituir o esboço atual, serão retirados os arquivos Python e suas dependências: `main.py`, `classes.py`, `pyproject.toml`, `uv.lock` e `.python-version`, além da configuração Python do ambiente. A preparação também revisará o `.gitignore` para excluir segredos locais, dependências instaladas e arquivos gerados. Essas alterações fazem parte da migração futura.
+O inventário não encontrou aplicação Python remanescente. A configuração Python obsoleta do flake foi substituída por Go/MariaDB; o ambiente frontend foi preservado. O `.gitignore` protege segredos, dependências instaladas e artefatos gerados.
 
 ## 5. Como uma funcionalidade será codificada
 
@@ -170,8 +176,8 @@ A especificação prevê leitores e administradores, catálogo, estante pessoal,
 
 | Grupo | Entidades candidatas e relações |
 | --- | --- |
-| Contas | Leitor, perfil, sessão e permissões de administrador. O modelo Python `Leitor` é apenas uma referência inicial. |
-| Catálogo | Obra, edição, autor e gênero. A especificação relaciona uma obra a um autor e a várias edições; ISBN, páginas, idiomas, editora e data de publicação pertencem à edição. |
+| Contas | Identidade base `users`, perfis leitor/administrador por composição, sessões e recuperação persistidas. |
+| Catálogo | Obra, edição, autores N:M conforme PNG, editoras e gêneros N:M; ISBN, páginas, idioma, editora e publicação pertencem à edição. |
 | Estante | Relação entre leitor e obra, com status; propõe-se referenciar também a edição usada na leitura para calcular o progresso. |
 | Publicações | Diários e avaliações vinculados ao leitor autor e à obra, com referência à edição quando necessária e indicadores de spoiler e conteúdo sensível. |
 | Interações | Comentários e curtidas associados ao leitor responsável e ao conteúdo de destino; o modelo conceitual também prevê curtidas em comentários. |
@@ -182,7 +188,7 @@ A especificação prevê leitores e administradores, catálogo, estante pessoal,
 
 Regras a preservar na implementação:
 
-- Cada leitor terá um único status por obra na estante: quero ler, lendo, lido ou abandonado (RN04).
+- Cada leitor terá um único status por obra na estante: quero ler, lendo, lido ou abandonado (RN04), mais pausado conforme o diagrama.
 - O diário exigirá conteúdo e progresso; ao registrá-lo, uma obra com status diferente de lendo ou lido passará automaticamente para lendo (UC02/E01).
 - Diário e avaliação terão autoria identificada; edição e exclusão pelo leitor ficarão restritas ao próprio conteúdo (RN03 e casos de uso).
 - Toda publicação deverá declarar a presença ou ausência de spoiler (RN02). Diários e avaliações permitirão marcar conteúdo sensível; spoilers e conteúdo sensível ficarão ocultos até confirmação do leitor (RF23 e RF24).
@@ -202,7 +208,7 @@ O DBeaver será configurado para a mesma instância MariaDB utilizada pela API, 
 
 ## 7. Contrato da API e integração
 
-A API utilizará JSON, com prefixo `/api/v1`. Os endpoints abaixo são uma **proposta inicial**, a ser detalhada em OpenAPI; não estão disponíveis no código atual.
+A API usa JSON e prefixo `/api/v1`. A tabela abaixo resume recursos; o [OpenAPI completo](Docs/api.yaml) é o contrato executável e inclui caminhos concretos, DTOs, paginação, CSRF e permissões.
 
 | Recurso | Rotas propostas | Finalidade |
 | --- | --- | --- |
@@ -216,13 +222,13 @@ A API utilizará JSON, com prefixo `/api/v1`. Os endpoints abaixo são uma **pro
 | Curtidas | `PUT`, `DELETE /api/v1/posts/:id/like` | Curtir e descurtir de forma idempotente. |
 | Denúncias | `POST /api/v1/reports` | Encaminhar conteúdo para análise. |
 
-Rotas administrativas, manutenção do catálogo, recomendações, estatísticas e suporte serão detalhadas nas etapas correspondentes. Operações privadas exigirão autenticação e autorização sobre o recurso; conhecer um ID não dará permissão para alterá-lo.
+Rotas administrativas, manutenção do catálogo, recomendações, estatísticas e suporte constam no OpenAPI. Operações privadas exigem autenticação e autorização sobre o recurso; conhecer um ID não dá permissão para alterá-lo.
 
 Os campos JSON utilizarão `snake_case`, com datas e horários em ISO 8601 e persistência em UTC. Listagens terão paginação e limites definidos no contrato. A identidade do autor virá da sessão validada pela API, sem confiar em um `reader_id` enviado pela interface.
 
 Respostas utilizarão códigos HTTP coerentes: `200` para consultas e atualizações com corpo, `201` para criação, `204` para sucesso sem corpo, `400` para entrada inválida, `401` para ausência de autenticação, `403` para acesso negado, `404` para recurso não encontrado, `409` para conflitos e `500` para falhas internas.
 
-Exemplo do formato de erro planejado:
+Exemplo do formato de erro implementado:
 
 ```json
 {
@@ -252,9 +258,9 @@ Nesse mesmo diretório, `npm run lint` verifica o código atual e `npm run build
 
 ### Preparar o ambiente definitivo
 
-Na primeira etapa serão instalados/configurados Go, Node.js, npm, MariaDB e DBeaver. O `flake.nix` será atualizado para refletir essas dependências. As versões e o procedimento completo serão registrados nos READMEs de cada aplicação.
+Go e MariaDB foram configurados para o backend e o `flake.nix` foi alinhado à stack, preservando o frontend. As versões e o procedimento completo estão no README de cada aplicação.
 
-Exemplo de variáveis **planejadas** para `Backend/.env.example`:
+Resumo das variáveis de banco de `Backend/.env.example` (veja o arquivo para a configuração completa, inclusive a chave da outbox):
 
 ```dotenv
 APP_ENV=development
@@ -273,21 +279,21 @@ Exemplo para `Frontend/radar_literario/.env.example`:
 VITE_API_BASE_URL=http://localhost:8080/api/v1
 ```
 
-O carregamento das configurações será implementado em `config`; Go não carregará `.env` automaticamente. A conexão GORM será montada com essas variáveis, suporte a `utf8mb4`, leitura de datas e limites do pool de conexões. Arquivos `.env.example` terão apenas exemplos; senhas reais ficarão fora do Git. Variáveis `VITE_*` são públicas no navegador e não receberão segredos.
+O pacote `config` carrega `.env` explicitamente; Go não o faz automaticamente. A conexão GORM usa essas variáveis, `utf8mb4`, datas UTC e limites do pool. `.env.example` contém somente exemplos; segredos reais ficam fora do Git. Variáveis `VITE_*` são públicas no navegador e não podem receber segredos.
 
-Depois que o módulo Go, a configuração e as migrações estiverem implementados, a sequência será: iniciar MariaDB, aplicar migrações, executar a API a partir de `Backend` e iniciar o front-end em outro terminal. Os comandos previstos para a API são:
+Para executar o backend: iniciar MariaDB, aplicar migrações e iniciar a API a partir de `Backend`. O frontend atual pode ser executado independentemente em outro terminal. Os comandos da API são:
 
 ```sh
 cd Backend
 go mod download
-go run .
+go run ./cmd/api
 ```
 
-Esses comandos ainda não iniciam o back-end neste estado do repositório, pois não há `go.mod` nem aplicação Go. O README da API deverá incluir o comando real da ferramenta de migração quando ela for escolhida.
+Antes de executar, configure o banco e aplique as migrações com `go run ./cmd/migrate -command up` usando `.env.migrate`, conforme [README da API](Backend/README.md). Existe módulo Go e a aplicação é iniciada por `cmd/api`.
 
-A proposta inicial de autenticação é uma sessão controlada pelo servidor, com cookie `HttpOnly`, `Secure` em produção e política `SameSite` definida para a implantação. A implementação deverá incluir expiração, revogação no logout e proteção contra CSRF nas operações de escrita. Se front-end e API estiverem em origens diferentes, o cliente enviará credenciais e o CORS permitirá somente origens configuradas.
+A autenticação usa sessão opaca persistida no servidor, cookie `HttpOnly`, `Secure` em produção e `SameSite` configurável. Há expiração absoluta/por inatividade, rotação, revogação e CSRF nas escritas, inclusive pré-login. O CORS permite apenas origens configuradas; a futura View enviará credenciais.
 
-Senhas serão armazenadas como hash apropriado para senhas, nunca em texto puro. Logs não deverão registrar credenciais. O formato da sessão e sua persistência serão documentados na etapa de autenticação, antes da integração dos fluxos privados.
+Senhas usam bcrypt custo 12; sessões e tokens usam segredos aleatórios armazenados como hash. Logs não registram corpos nem credenciais. Recuperação tem consumo único e outbox SMTP cifrada. Veja os detalhes e exemplos no README do backend.
 
 ## 9. Plano de entregas e gestão
 
@@ -311,7 +317,7 @@ A reescrita do front-end acompanhará as entregas funcionais a partir da etapa 1
 2. Mover a tarefa por: a fazer, em andamento, em revisão e concluída.
 3. Trabalhar em uma branch por tarefa, com commits pequenos e descritivos.
 4. Revisar código, migrações, contratos e testes antes de integrar a entrega.
-5. Atualizar os documentos afetados e registrar decisões em `Docs/decisoes.md`, arquivo a criar na preparação.
+5. Atualizar os documentos afetados e registrar decisões em `Docs/decisoes.md`.
 
 Mudanças de contrato deverão atualizar API e front-end na mesma entrega ou prever compatibilidade explícita. Mudanças de escopo terão o impacto e a prioridade registrados na tarefa.
 
@@ -326,16 +332,16 @@ Mudanças de contrato deverão atualizar API e front-end na mesma entrega ou pre
 
 Os testes de integração usarão um banco separado, nunca dados pessoais ou de produção. A verificação incluirá cenários de falha e tentativa de acesso a recursos de outro leitor, além dos caminhos de sucesso.
 
-## 10. Decisões que precisam ser fechadas
+## 10. Decisões do backend
 
 | Questão | Encaminhamento |
 | --- | --- |
-| Quando uma avaliação pode ser publicada? | A especificação apresenta avaliação final de obra lida, mas o UC03 também admite leitura em andamento. Unificar a regra antes de implementar avaliações. |
-| Qual é o escopo de uma avaliação existente? | O UC03 oferece edição quando o leitor já avaliou o livro. Confirmar se a unicidade será por leitor/obra ou leitor/edição e definir a agregação da média. |
-| Como aplicar a restrição etária? | A regra NR08 impede visualizar diários e avaliações acima da faixa etária do leitor, mas não define categorias nem procedimento. Detalhar classificação e controle de acesso antes de implementar. |
-| Como tratar exclusões de conta e conteúdo? | Definir o destino das publicações, comentários, denúncias e histórico, incluindo regras de retenção e integridade. |
-| Como cadastrar e alterar obras e edições? | Definir permissões, identificação de duplicatas e o caminho de sugestão e aprovação administrativa. |
-| Como calcular recomendações e estatísticas? | Definir fórmulas, fontes de dados e critérios verificáveis; as listas simuladas não constituem um algoritmo definitivo. |
-| Como executar e publicar a aplicação? | Definir versões, ferramenta de migração, armazenamento de sessão, hospedagem, HTTPS, backup e configuração por ambiente nas etapas correspondentes. |
+| Quando uma avaliação pode ser publicada? | Leitura em andamento ou concluída, compatibilizando UC03. |
+| Qual é o escopo de uma avaliação existente? | Uma vigente por leitor/obra; exclusão voluntária libera novo post, moderação preserva bloqueio; média SQL das elegíveis. |
+| Como aplicar a restrição etária? | Classificação 0/10/12/14/16/18; idade civil autodeclarada; visitante sem idade só classificação 0; obra atual limita todos os caminhos. |
+| Como tratar exclusões de conta e conteúdo? | Anonimização/remoção privada imediata, conteúdo indisponível e purga configurável das evidências restritas. |
+| Como cadastrar e alterar obras e edições? | CRUD administrativo; leitores usam sugestões com versão do alvo e decisão transacional auditada; ISBN canônico na edição. |
+| Como calcular recomendações e estatísticas? | SQL determinístico de afinidade/gêneros, médias/amostras e eventos de progresso UTC; fórmulas nos documentos de cobertura. |
+| Como executar e publicar a aplicação? | Go 1.27.3, MariaDB, Goose e instruções Windows/Linux no README; backup restaurado em ensaio; hospedagem/HTTPS e agendamento permanecem operacionais futuros. |
 
-Este documento será atualizado conforme as decisões forem tomadas e as etapas concluídas, sempre distinguindo o que está planejado do que já funciona no repositório.
+As questões acima foram resolvidas para o backend pelo prompt e estão registradas com contexto, escolha, impacto e aceite em [decisoes.md](Docs/decisoes.md), seus complementos por módulo e [cobertura_backend.md](Docs/cobertura_backend.md). Avaliação é única por leitor/obra enquanto vigente e permitida em leitura/conclusão; idade usa classificação 0/10/12/14/16/18; exclusão anonimiza identidade e restringe evidências; estatísticas/recomendações têm fórmulas SQL determinísticas. Publicação/hospedagem e integração da View permanecem fora desta implementação.

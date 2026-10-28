@@ -1,0 +1,38 @@
+services:
+  db:
+    image: mariadb:11.8.5
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:?defina a senha administrativa}
+      MARIADB_DATABASE: radar_literario
+    ports:
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - database:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  mail:
+    image: axllent/mailpit:v1.27.8
+    ports:
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:8025:8025"
+  test-db:
+    image: mariadb:11.8.5
+    profiles: ["test"]
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_TEST_ROOT_PASSWORD:?defina a senha administrativa de testes}
+      MARIADB_DATABASE: radar_literario_test
+    ports:
+      - "127.0.0.1:3308:3306"
+    volumes:
+      - test-database:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+volumes:
+  database:
+  test-database:

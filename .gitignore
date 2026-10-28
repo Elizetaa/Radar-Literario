@@ -1,0 +1,16 @@
+**/.env
+**/.env.*
+!**/.env.example
+.local/
+**/node_modules/
+**/dist/
+Backend/bin/
+Backend/*.exe
+Backend/api
+Backend/admin
+Backend/coverage*
+*.log
+*.dump
+*.sql.gz
+Backend/backups/
+Backend/data/

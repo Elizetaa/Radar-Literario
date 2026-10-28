@@ -8,11 +8,8 @@
       in
       pkgs.mkShell {
         packages = with pkgs; [
-          (python313.withPackages (ps: with ps; [
-            pydantic
-            sqlalchemy
-            fastapi
-        ]))
+        go
+        mariadb
         dbeaver-bin
         nodejs_26
         ];
