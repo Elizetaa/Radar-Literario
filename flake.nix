@@ -9,6 +9,8 @@
       pkgs.mkShell {
         packages = with pkgs; [
         go
+        gopls
+        gotools
         mariadb
         dbeaver-bin
         nodejs_26
