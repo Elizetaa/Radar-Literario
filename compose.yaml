@@ -1,0 +1,61 @@
+services:
+  data:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./data/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [internal]
+
+  back:
+    build: ./Backend
+    restart: unless-stopped
+    environment:
+      DB_HOST: data
+      DB_PORT: 3306
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      GIN_MODE: release
+    depends_on:
+      data:
+        condition: service_healthy
+    networks: [internal]
+
+  front:
+    build: ./front
+    restart: unless-stopped
+    depends_on:
+      - back
+    networks: [internal]
+
+  proxy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [front, back]
+    networks: [internal]
+
+volumes:
+  mariadb_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  internal:
