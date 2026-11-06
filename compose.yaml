@@ -1,6 +1,9 @@
 services:
+
+  #Container de Banco de Dados
   data:
-    image: mariadb:11
+    image: mariadb:13
+    container_name: banco_mariadb
     restart: unless-stopped
     environment:
       MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
@@ -9,12 +12,29 @@ services:
       MARIADB_PASSWORD: ${DB_PASSWORD}
     volumes:
       - mariadb_data:/var/lib/mysql
-      - ./data/init:/docker-entrypoint-initdb.d:ro
+      #- ./data/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 5s
       timeout: 5s
       retries: 20
+    networks: [internal]
+
+  migrate:
+    build: ./Backend
+    command: ["/app/migrate", "-command", "up"]
+    restart: "no"
+    env_file: ./Backend/.env
+    environment:
+      DB_HOST: data
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      OUTBOX_ENCRYPTION_KEY: ${OUTBOX_ENCRYPTION_KEY}
+    depends_on:
+      data:
+        condition: service_healthy
     networks: [internal]
 
   back:
@@ -26,30 +46,32 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
-      GIN_MODE: release
+      OUTBOX_ENCRYPTION_KEY: ${OUTBOX_ENCRYPTION_KEY}
     depends_on:
-      data:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
     networks: [internal]
 
   front:
-    build: ./front
+    build:
+      context: ./Frontend
+      args:
+        VITE_API_URL: /api
     restart: unless-stopped
-    depends_on:
-      - back
-    networks: [internal]
-
-  proxy:
-    image: caddy:2
-    restart: unless-stopped
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
-    depends_on: [front, back]
+    depends_on: [back]
     networks: [internal]
 
 volumes:
