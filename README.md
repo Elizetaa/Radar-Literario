@@ -20,9 +20,7 @@ Com Go 1.21+, `go env -w GOTOOLCHAIN=auto` permite baixar a versão exigida pelo
 ### Windows
 
 Instale [Go](https://go.dev/doc/install), [Node.js LTS com npm](https://nodejs.org/en/download)
-e [MariaDB Server](https://mariadb.org/download/). No instalador do MariaDB,
-defina a senha de `root`, habilite o serviço e mantenha a porta `3306`.
-Reabra o PowerShell; adicione a pasta `bin` do MariaDB ao PATH para usar `mariadb`.
+e [MariaDB Server](https://mariadb.org/download/)
 
 ### Nix / NixOS
 
@@ -130,28 +128,32 @@ go run ./cmd/api
 API: http://127.0.0.1:8080. `/health` verifica o processo; `/ready` verifica
 banco e migrações. Se indicar migrações pendentes, execute o comando de migração acima.
 
-O `.env.example` usa SMTP em `localhost:1025`. Para enviar e-mails, configure um
-servidor SMTP ou um capturador local, como Mailpit. Com Docker instalado:
-
-```bash
-docker compose up -d mail
-```
-
-Os e-mails capturados aparecem em http://localhost:8025.
-
 Em outro terminal, partindo de `Backend`, inicie o frontend:
 
 ```bash
-cd ../Frontend/radar_literario
+cd ../Frontend/radar_literario_integrado
 npm ci
 npm run dev
 ```
 
-Abra o endereço exibido pelo Vite (normalmente http://localhost:5173).
+Abra o endereço exibido pelo Vite (http://localhost:5173).
 
-## Referências
+## 5. Teste de Backend
 
-- [Contrato da API](../Docs/api.yaml)
-- [Backup e restauração](../Docs/backup.md)
-- [Decisões do backend](../Docs/decisoes.md)
-- Instalação: [MariaDB](https://mariadb.com/docs/server/mariadb-quickstart-guides/installing-mariadb-server-guide), [MariaDB no NixOS](https://wiki.nixos.org/wiki/Mysql), [toolchains Go](https://go.dev/doc/toolchain).
+Para executar o teste da API do Backend e verificar os registros no banco de dados, execute esta etapa com o Backend já iniciado.
+
+```bash
+cd ../Frontend/backend_tester
+npm ci
+npm run dev
+```
+
+Abra o endereço exibido pelo Vite (http://localhost:5174).
+
+Para realizar alterações no Banco de Dados, utilize o login de usuário com permissões administrativas.
+
+## 6. Carga de dados iniciais
+
+Para importar ao banco de dados e estar a API e o front, é necessário o registro de alguns dados no banco de dados. Para isso, foi criado o arquivo <seed_catalog_populares.sql>, com alguns registro de obras, editoras, autores, categorias e edições de livros.
+
+Execute o script via Dbeaver ou sistema gerenciador de banco de dados de preferência.
