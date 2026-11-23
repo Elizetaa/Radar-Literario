@@ -73,7 +73,14 @@ export const libraryService = {
     const onShelf = new Set(list(shelf).map((i) => i.work_id))
     let works = list(rec)
     if (!works.length) works = list(await backendApi.popular())
-    return works.filter((w) => !onShelf.has(w.id)).map((w) => workToBook(w))
+    works = works.filter((w) => !onShelf.has(w.id)).slice(0, 15)
+    // O catálogo não traz páginas/capa: vêm da primeira edição de cada obra (falha numa não derruba as outras).
+    return Promise.all(works.map(async (w) => {
+      try {
+        const ed = (list(await backendApi.editions(w.id)))[0]
+        return workToBook(w, { editionId: ed?.id, totalPages: ed?.page_count || 0, cover: ed?.image_url || '' })
+      } catch { return workToBook(w, { totalPages: 0 }) }
+    }))
   },
 
   // "Tenho interesse" = obra na estante com status planned.

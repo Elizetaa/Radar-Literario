@@ -1,0 +1,4 @@
+**/node_modules/
+
+# Ignorando configurações
+.env
