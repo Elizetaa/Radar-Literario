@@ -1,6 +1,6 @@
 # Radar Literário
 
-Frontend em React 19, Vite e Tailwind CSS 4 para descobrir livros, acompanhar leituras e compartilhar avaliações. A interface combina utilitários Tailwind e estilos responsivos próprios inspirados nas cores roxas, cartões e hierarquia visual das telas de `../../Docs/imagens.pdf`.
+Frontend em React 19, Vite e Tailwind CSS 4 para descobrir livros, acompanhar leituras e compartilhar avaliações. A interface combina os utilitários Tailwind e estilos responsivos inspirados nas cores roxas do tema, cartões e hierarquia visual das telas de `../../Docs/imagens.pdf`.
 
 ## Executar
 
@@ -56,9 +56,9 @@ A opção **Destaques da comunidade** preserva a tela anterior de sugestões. A 
 
 ## Dados e decisões
 
-O serviço em `src/services/libraryService.js` é o ponto de troca por chamadas HTTP. Os registros originais continuam em memória e reiniciam ao recarregar a página. Os livros aceitos nas indicações, incluindo seu progresso posterior e sua remoção, são mantidos no `localStorage` deste navegador, com a chave exclusiva `radar-literario:prototype:interested-books:v1`. Se o navegador bloquear esse armazenamento, a tela continua funcionando em memória durante a sessão.
+O serviço em `src/services/libraryService.js` é o ponto de troca por chamadas HTTP. Os registros originais continuam na memória e reiniciam ao recarregar a página. Os livros aceitos nas indicações, incluindo seu progresso posterior e sua remoção, são mantidos no `localStorage` deste navegador, com a chave exclusiva `radar-literario:prototype:interested-books:v1`. Se o navegador bloquear o armazenamento, a tela continua funcionando em memória durante a sessão.
 
-Não há login, autorização ou segurança real; a sessão e as ações de conta são demonstrações. As capas são ilustrações locais em CSS, então não dependem de chamadas externas. O catálogo de indicações, suas notas e seus metadados são demonstrativos, sem integração com serviços externos. A funcionalidade permanece inteiramente dentro de `Frontend/radar_literario`, sem dependências novas ou alterações no back-end.
+Não há login, autorização ou segurança real; a sessão e as ações de conta são apenas demonstrações. As capas são ilustrações locais em CSS, então não dependem de chamadas externas. O catálogo de indicações, suas notas e seus metadados são demonstrativos, sem integração com serviços externos. A funcionalidade permanece inteiramente dentro de `Frontend/radar_literario`, sem dependências novas ou alterações no back-end.
 
 As imagens do protótipo são capturas em formato mobile; a interface preserva os elementos e fluxos visíveis e reorganiza o conteúdo para desktop, mantendo navegação compacta em telas estreitas. O perfil aberto corresponde à sessão já iniciada nas capturas, por isso não foi criada uma tela de login. A exclusão de conta é tratada como confirmação de demonstração. A referência inclui telas de registro de leitura, avaliação, cadastro de obra, feed, perfil, comentários e recomendações; os rótulos inconsistentes são normalizados para “diário de leitura”, “avaliação” e “livro”.
 
