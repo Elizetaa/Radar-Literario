@@ -87,7 +87,17 @@ export const libraryService = {
     if (!workId) throw new Error('Escolha uma obra do catálogo.')
     return this.saveInterest(workId)
   },
-  searchCatalog: async (title) => list(await backendApi.works(title)).map((w) => workToBook(w)),
+  // Busca no catálogo (banco): por título OU autor, com filtro opcional de gênero.
+  async searchCatalog(term = '', genreId = 0) {
+    const [byTitle, byAuthor] = await Promise.all([
+      backendApi.catalog({ title: term, genreId }),
+      term ? backendApi.catalog({ author: term, genreId }) : { data: [] },
+    ])
+    const seen = new Map()
+    for (const w of [...list(byTitle), ...list(byAuthor)]) if (!seen.has(w.id)) seen.set(w.id, w)
+    return [...seen.values()].map((w) => workToBook(w))
+  },
+  async getGenres() { return list(await backendApi.genres()).filter((g) => g.active !== false) },
 
   // changes: { pages, rating, lastOpinion } — o progresso vai pra estante, a nota vira review.
   async updateBook(workId, changes) {

@@ -1,4 +1,4 @@
-const API_BASE = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8080/api/v1').replace(/\/$/, '')
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || '/api/v1').replace(/\/$/, '')
 
 let csrfToken = ''
 
@@ -54,6 +54,14 @@ export const backendApi = {
   createEntry: (input) => request('/reading-entries', { method: 'POST', body: input, csrf: true }),
 
   // --- usados pelo libraryService (rotas conferidas em internal/controller/*.go) ---
+  catalog: ({ title = '', author = '', genreId = 0 } = {}) => {
+    const q = new URLSearchParams({ page: '1', page_size: '40' })
+    if (title) q.set('title', title)
+    if (author) q.set('author', author)
+    if (genreId) q.set('genre_id', String(genreId))
+    return request(`/works?${q}`)
+  },
+  genres: () => request('/genres?page=1&page_size=100'),
   work: (id) => request(`/works/${id}`),
   edition: (id) => request(`/editions/${id}`),
   recommendations: () => request('/me/recommendations?page=1&page_size=30'),
