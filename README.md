@@ -152,8 +152,8 @@ Abra o endereço exibido pelo Vite (http://localhost:5174).
 
 Para realizar alterações no Banco de Dados, utilize o login de usuário com permissões administrativas.
 
-## 6. Carga de dados iniciais
+## 6. Carga de dados iniciais (Seed)
 
-Para importar ao banco de dados e estar a API e o front, é necessário o registro de alguns dados no banco de dados. Para isso, foi criado o arquivo <seed_catalog_populares.sql>, com alguns registro de obras, editoras, autores, categorias e edições de livros.
+Para importar ao banco de dados e estar a API e o front, é necessário o registro de alguns dados no banco de dados. Para isso, foi criado o arquivo `/Data_seed/seed_catalog_populares.sql`, com alguns registro de obras, editoras, autores, categorias e edições de livros.
 
 Execute o script via Dbeaver ou sistema gerenciador de banco de dados de preferência.

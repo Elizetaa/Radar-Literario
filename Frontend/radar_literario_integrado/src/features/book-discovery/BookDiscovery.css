@@ -118,35 +118,37 @@
   .bd-guide { padding: 22px 17px 18px; }
 }
 
-@media (max-width: 650px) {
-  .bd-heading { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; margin: 2px 0 19px; }
-  .bd-heading .bd-eyebrow, .bd-heading p { display: none; }
-  .bd-heading h1 { font-size: 22px; margin: 0; }
-  .bd-shelf-link { font-size: 10px; padding: 8px 10px; }
-  .bd-layout { display: flex; flex-direction: column; gap: 7px; padding: 0; }
-  .bd-main { width: min(100%, 400px); align-self: center; }
-  .bd-progress-heading > span:first-child { font-size: 8px; }
-  .bd-card-stage { margin: 20px 9px 0; }
-  .bd-artwork { height: 200px; padding: 15px 0; }
-  .bd-cover { width: 121px; height: 170px; padding: 13px 12px 17px; }
-  .bd-cover-title { font-size: 18px; }
-  .bd-cover-caption { font-size: 4px; }
-  .bd-cover-edition { bottom: 17px; }
-  .bd-book-details { padding: 17px 19px; }
-  .bd-book-details h2 { font-size: 21px; }
-  .bd-description { font-size: 11px; margin: 12px 0; }
-  .bd-actions { margin-top: 25px; gap: 34px; }
-  .bd-choice-icon { width: 52px; height: 52px; }
-  .bd-guide { width: min(100%, 400px); align-self: center; margin: 0; padding: 19px 20px; }
-  .bd-guide-spark { display: none; }
-  .bd-guide h2 { font-size: 23px; margin-top: 6px; }
-  .bd-guide h2 br { display: none; }
-  .bd-guide > p, .bd-guide-rule, .bd-guide-footnote { display: none; }
-  .bd-guide-step { margin: 13px 0 0; }
-  .bd-guide-step p { font-size: 11px; }
-  .bd-complete { margin-top: 0; min-height: 350px; padding: 36px 23px 30px; }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .book-discovery *, .book-discovery *::before, .book-discovery *::after { animation: none; transition: none; }
+}
+
+/* ===== [MOBILE] Indicações no telefone ===== */
+@media (max-width: 767px) {
+  /* O arrasto horizontal fica no cartão e pan-y preserva a rolagem. A
+     contenção de pintura mantém o cartão animado dentro da largura da página. */
+  .book-discovery { overflow: clip; padding-inline: 4px; }
+  .bd-card { touch-action: pan-y pinch-zoom; transition: transform .23s ease; }
+  .bd-card-dragging, .bd-progress > span { transition: none; }
+  .bd-heading { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; margin: 2px 0 19px; }
+  .bd-heading .bd-eyebrow, .bd-heading p, .bd-keyboard-hint > span, .bd-guide { display: none; }
+  .bd-heading h1 { font-size: 23px; margin: 0; }
+  .bd-layout { display: flex; flex-direction: column; padding: 0; }
+  .bd-main { width: min(100%, 440px); align-self: center; }
+  .bd-progress-heading > span:first-child { font-size: 10px; }
+  .bd-progress-heading, .bd-book-category, .bd-page-count,
+  .bd-author, .bd-description, .bd-keyboard-hint, .bd-status { color: var(--purple-dark); }
+  .bd-card-stage { margin: 20px 6px 0; }
+  .bd-artwork { height: 204px; padding: 15px 0; }
+  .bd-cover { width: 121px; height: 170px; padding: 13px 12px 17px; }
+  .bd-cover-title { font-size: 18px; overflow-wrap: anywhere; }
+  .bd-cover-caption { font-size: 4px; }
+  .bd-cover-edition { bottom: 17px; }
+  .bd-book-details { padding: 16px; overflow-wrap: anywhere; }
+  .bd-book-details h2 { font-size: 22px; }
+  .bd-description, .bd-author, .bd-complete > p { font-size: 14px; }
+  .bd-actions { gap: 16px; margin-top: 25px; }
+  .bd-complete { margin-top: 0; min-height: 350px; padding: 36px 23px 30px; }
+  .bd-choice, .bd-shelf-link, .bd-complete-button { min-height: 44px; min-width: 44px; font-size: 13px; }
+  .bd-choice:hover .bd-choice-icon { transform: none; }
+  .bd-choice:active .bd-choice-icon { opacity: .75; }
 }
