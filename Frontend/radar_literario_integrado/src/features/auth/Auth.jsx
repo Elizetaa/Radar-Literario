@@ -22,19 +22,16 @@ export default function Auth({ onDone }) {
     } finally { setBusy(false) }
   }
 
-  // [MOBILE] As sugestões de preenchimento e o teclado seguem o tipo de cada campo.
-  // O formulário usa os mesmos tamanhos de fonte e de toque dos demais fluxos.
-  return <div className="app-shell auth-shell">
-    <form className="form-stack" onSubmit={submit}>
+  return <div className="app-shell min-h-screen" style={{ display: 'grid', placeItems: 'center', padding: 16 }}>
+    <form className="form-stack" onSubmit={submit} style={{ width: 'min(420px, 100%)' }}>
       <h1>{mode === 'login' ? 'Entrar no Radar Literário' : 'Criar conta'}</h1>
       {mode === 'register' && <>
-        <label>Nome<input required autoComplete="name" value={form.name} onChange={set('name')} /></label>
-        <label>Apelido<input required autoComplete="nickname" autoCapitalize="none" spellCheck={false} pattern="[a-z0-9_]{3,30}" placeholder="leitor_123" value={form.nickname} onChange={set('nickname')} /></label>
-        <label>Data de nascimento<input required type="date" autoComplete="bday" max={today} value={form.birth_date} onChange={set('birth_date')} /></label>
+        <label>Nome<input required value={form.name} onChange={set('name')} /></label>
+        <label>Apelido<input required pattern="[a-z0-9_]{3,30}" placeholder="leitor_123" value={form.nickname} onChange={set('nickname')} /></label>
+        <label>Data de nascimento<input required type="date" max={today} value={form.birth_date} onChange={set('birth_date')} /></label>
       </>}
-      <label>E-mail<input required type="email" inputMode="email" autoCapitalize="none" autoComplete="email" value={form.email} onChange={set('email')} /></label>
+      <label>E-mail<input required type="email" autoComplete="email" value={form.email} onChange={set('email')} /></label>
       <label>Senha<input required type="password" minLength="8" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} value={form.password} onChange={set('password')} /></label>
-      {/* [ALTERADO] role=alert anuncia a falha de autenticação junto ao formulário. */}
       {error && <p className="form-error" role="alert">{error}</p>}
       <button className="primary-button" disabled={busy}>{busy ? 'Aguarde…' : mode === 'login' ? 'Entrar' : 'Cadastrar e entrar'}</button>
       <button type="button" className="text-button" onClick={() => { setError(''); setMode(mode === 'login' ? 'register' : 'login') }}>

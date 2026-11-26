@@ -1,9 +1,114 @@
+/*
+ * index.css — estilos GLOBAIS (valem para o site inteiro).
+ *
+ * Aqui ficam só: a importação do Tailwind, as variáveis de cor/fonte e o "reset"
+ * básico de elementos HTML. Estilos de telas e componentes estão em App.css e
+ * em features/book-discovery/BookDiscovery.css.
+ */
+
 @import "tailwindcss";
 
-:root{font-family:Inter,'Segoe UI',Arial,sans-serif;color:#27232b;background:#faf9fb;font-synthesis:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;font-optical-sizing:auto;font-weight:400;font-size:14px;font-feature-settings:'ss01' on;--purple:#8337a1;--purple-dark:#4c285a;--purple-soft:#f3eaf6;--ink:#29242c;--muted:#8b858e;--border:#ebe8ed;--surface:#fff;--green:#6d9b70;--font-heading:Inter,'Segoe UI',Arial,sans-serif}
-*{box-sizing:border-box}body{margin:0;min-width:320px;min-height:100vh}button,input,textarea,select{font:inherit}button{color:inherit}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #c998d6;outline-offset:2px}button:disabled{cursor:default}::selection{background:#e8d4ed;color:#3d2548}h1,h2,h3,p{margin-top:0}button{cursor:pointer}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+/* ===== Variáveis e fonte global ===== */
+/* Variáveis de cor (--purple etc.) e a fonte padrão. Todos os outros CSS usam essas
+   variáveis com var(--nome); para mudar a identidade visual, altere aqui. */
+:root {
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  color: #27232b;
+  background: #faf9fb;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-size: 14px;
+  font-feature-settings: "ss01" on;
+  --purple: #8337a1;
+  --purple-dark: #4c285a;
+  --purple-soft: #f3eaf6;
+  --ink: #29242c;
+  --muted: #8b858e;
+  --border: #ebe8ed;
+  --surface: #fff;
+  --green: #6d9b70;
+  --font-heading: Inter, "Segoe UI", Arial, sans-serif;
+}
+
+/* Faz width/height incluírem borda e padding (evita surpresas no tamanho dos elementos). */
+* {
+  box-sizing: border-box;
+}
+
+/* Sem margem padrão do navegador; largura mínima de 320px (celulares pequenos). */
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+/* Botões e campos herdam a fonte da página (por padrão o navegador usa outra). */
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+/* Botões herdam a cor do texto do elemento pai. */
+button {
+  color: inherit;
+}
+
+/* Contorno roxo ao navegar por teclado (Tab). Importante para acessibilidade. */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 3px solid #c998d6;
+  outline-offset: 2px;
+}
+
+/* Botão desativado não mostra a "mãozinha". */
+button:disabled {
+  cursor: default;
+}
+
+/* Cor do texto quando o usuário o seleciona com o mouse. */
+::selection {
+  background: #e8d4ed;
+  color: #3d2548;
+}
+
+/* Títulos e parágrafos sem margem superior; o espaço é controlado nos componentes. */
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+/* Botões mostram a "mãozinha" ao passar o mouse (vem depois de :disabled, que a sobrepõe
+   só quando necessário). */
+button {
+  cursor: pointer;
+}
+
+/* Texto visível apenas para leitores de tela (esconde sem usar display:none, que também
+   esconderia deles). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 /* [MOBILE] A altura dinâmica acompanha a área útil em retrato e paisagem. */
 @media (max-width: 767px) {
-  body { min-height: 100dvh; }
+  body {
+    min-height: 100dvh;
+  }
 }
